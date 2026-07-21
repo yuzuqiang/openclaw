@@ -192,6 +192,14 @@ import {
   BoardWidgetSchema,
 } from "./board.js";
 import {
+  ChannelsPairingApproveParamsSchema,
+  ChannelsPairingApproveResultSchema,
+  ChannelsPairingDismissParamsSchema,
+  ChannelsPairingDismissResultSchema,
+  ChannelsPairingListParamsSchema,
+  ChannelsPairingListResultSchema,
+} from "./channel-pairing.js";
+import {
   ChannelsStartParamsSchema,
   ChannelsStopParamsSchema,
   ChannelsLogoutParamsSchema,
@@ -969,6 +977,12 @@ export const ProtocolSchemas = {
   TtsSpeakResult: TtsSpeakResultSchema,
   ChannelsStatusParams: ChannelsStatusParamsSchema,
   ChannelsStatusResult: ChannelsStatusResultSchema,
+  ChannelsPairingListParams: ChannelsPairingListParamsSchema,
+  ChannelsPairingListResult: ChannelsPairingListResultSchema,
+  ChannelsPairingApproveParams: ChannelsPairingApproveParamsSchema,
+  ChannelsPairingApproveResult: ChannelsPairingApproveResultSchema,
+  ChannelsPairingDismissParams: ChannelsPairingDismissParamsSchema,
+  ChannelsPairingDismissResult: ChannelsPairingDismissResultSchema,
   ChannelsStartParams: ChannelsStartParamsSchema,
   ChannelsStopParams: ChannelsStopParamsSchema,
   ChannelsLogoutParams: ChannelsLogoutParamsSchema,
