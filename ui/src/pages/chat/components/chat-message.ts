@@ -2701,6 +2701,7 @@ function renderGroupedMessage(
     assistantTranscriptRoleHeaders: role === "assistant",
     codeBlockChrome: role === "user" ? "none" : "copy",
     fileLinks: true,
+    interactiveImages: opts.onOpenImage !== undefined,
   };
 
   // Detect pure-JSON messages and render as collapsible block
