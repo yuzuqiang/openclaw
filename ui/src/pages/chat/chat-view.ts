@@ -27,11 +27,7 @@ import type { ChatSideResult, ChatSideResultPending } from "../../lib/chat/side-
 import type { EmbedSandboxMode } from "../../lib/chat/tool-display.ts";
 import type { ProviderUsageDisplayProps } from "../../lib/provider-quota-summary.ts";
 import type { UiSessionDefaultsHost } from "../../lib/sessions/session-key.ts";
-import {
-  handleChatAttachmentDrop,
-  isEditableDropTarget,
-  isFileDrag,
-} from "./components/chat-attachments.ts";
+import { createChatAttachmentDropHandlers } from "./components/chat-attachments.ts";
 import {
   renderBackgroundTasksRail,
   type BackgroundTasksProps,
@@ -320,32 +316,8 @@ export function renderChat(props: ChatProps) {
     ? (item: ImageLightboxItem) => openImage?.(item, props.onRequestOpenImage?.())
     : undefined;
   const sideChatVisible = isSideChatPanelVisible(sideChatProps);
+  const attachmentDropHandlers = createChatAttachmentDropHandlers({ ...props, canCompose });
   let chatSection: HTMLElement | null = null;
-  // Nested dragenter/dragleave events must stay balanced so crossing transcript
-  // children does not flicker the pane-level file drop affordance.
-  let attachmentDragDepth = 0;
-  const setAttachmentDropActive = (event: DragEvent, active: boolean) => {
-    const target = event.currentTarget;
-    if (!(target instanceof HTMLElement)) {
-      return;
-    }
-    if (active) {
-      if (!canCompose || !isFileDrag(event.dataTransfer)) {
-        return;
-      }
-      attachmentDragDepth += 1;
-    } else {
-      attachmentDragDepth = Math.max(0, attachmentDragDepth - 1);
-    }
-    target.toggleAttribute("data-attachment-drop-active", attachmentDragDepth > 0);
-  };
-  const clearAttachmentDropActive = (event: DragEvent) => {
-    attachmentDragDepth = 0;
-    const target = event.currentTarget;
-    if (target instanceof HTMLElement) {
-      target.removeAttribute("data-attachment-drop-active");
-    }
-  };
   const thread = renderChatThread(
     {
       paneId: props.paneId,
@@ -511,40 +483,11 @@ export function renderChat(props: ChatProps) {
             }
           : {},
       )}
-      @drop=${(event: DragEvent) => {
-        // Text/URL drops stay native only inside editable controls; anywhere
-        // else they are cancelled so a dropped link cannot navigate the app
-        // away. Session drags are handled by the parent chat page either way.
-        if (!isFileDrag(event.dataTransfer)) {
-          if (!isEditableDropTarget(event)) {
-            event.preventDefault();
-          }
-          return;
-        }
-        event.preventDefault();
-        clearAttachmentDropActive(event);
-        if (canCompose) {
-          handleChatAttachmentDrop(event, props);
-        }
-      }}
-      @dragenter=${(event: DragEvent) => setAttachmentDropActive(event, true)}
-      @dragleave=${(event: DragEvent) => setAttachmentDropActive(event, false)}
+      @drop=${attachmentDropHandlers.onDrop}
+      @dragenter=${attachmentDropHandlers.onDragenter}
+      @dragleave=${attachmentDropHandlers.onDragleave}
       @click=${(event: Event) => openInlineChatImage(event, openImmediateImage)}
-      @dragover=${(event: DragEvent) => {
-        if (!isFileDrag(event.dataTransfer)) {
-          if (!isEditableDropTarget(event)) {
-            event.preventDefault();
-            if (event.dataTransfer) {
-              event.dataTransfer.dropEffect = "none";
-            }
-          }
-          return;
-        }
-        event.preventDefault();
-        if (event.dataTransfer) {
-          event.dataTransfer.dropEffect = canCompose ? "copy" : "none";
-        }
-      }}
+      @dragover=${attachmentDropHandlers.onDragover}
       @keydown=${(event: KeyboardEvent) => {
         if ((event.key === "Enter" || event.key === " ") && inlineChatImageFromEvent(event)) {
           openInlineChatImage(event, openImmediateImage);
