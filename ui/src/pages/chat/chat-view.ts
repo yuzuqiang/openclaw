@@ -40,11 +40,7 @@ import {
   renderBackgroundTasksRail,
   type BackgroundTasksProps,
 } from "./components/chat-background-tasks.ts";
-import {
-  isChatRunWorking,
-  renderChatComposer,
-  resetChatComposerState,
-} from "./components/chat-composer.ts";
+import { isChatRunWorking, renderChatComposer } from "./components/chat-composer.ts";
 import { renderChatPullRequests } from "./components/chat-pull-requests.ts";
 import {
   renderSessionWorkspaceRail,
@@ -64,7 +60,6 @@ import {
   renderChatPinnedMessages,
   renderChatSearchBar,
   renderChatThread,
-  resetChatThreadPresentationState,
   toggleChatThreadSearch,
 } from "./components/chat-thread.ts";
 import { renderWorkspaceConflictNotice } from "./components/chat-workspace-conflict.ts";
@@ -263,11 +258,6 @@ export type ChatProps = {
   onExpandPullRequests?: () => void;
   onDismissPullRequest?: (pullRequest: ControlUiSessionPullRequest) => void;
 };
-
-export function resetChatViewState(paneId?: string, owner?: ParentNode) {
-  resetChatComposerState(paneId);
-  resetChatThreadPresentationState(paneId, owner);
-}
 
 export function renderChatResizableDivider(props: {
   className?: string;

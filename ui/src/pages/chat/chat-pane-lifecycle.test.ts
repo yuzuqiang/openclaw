@@ -8,7 +8,6 @@ import {
   dismissConfirmedActionPopovers,
   openChatRewindConfirmation,
 } from "./components/chat-message.ts";
-import * as chatThread from "./components/chat-thread.ts";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -129,14 +128,10 @@ describe("chat pane presentation teardown", () => {
       expect(captureKeydownListener).toBeDefined();
       pane.appendChild(owner);
 
-      const resetPresentation = chatThread.resetChatThreadPresentationState;
       const stopAfterReset = new Error("stop after thread presentation reset");
-      vi.spyOn(chatThread, "resetChatThreadPresentationState").mockImplementation(
-        (paneId, presentationOwner) => {
-          resetPresentation(paneId, presentationOwner);
-          throw stopAfterReset;
-        },
-      );
+      vi.spyOn(pane, "cancelHeaderRename").mockImplementation(() => {
+        throw stopAfterReset;
+      });
 
       expect(() => pane.switchPaneSession("agent:main:next")).toThrow(stopAfterReset);
       expect(owner.querySelector(".chat-delete-confirm")).toBeNull();
